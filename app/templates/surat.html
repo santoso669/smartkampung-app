@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Pengajuan Surat — SmartKampung{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>📄 Ajukan Surat</h2>
+  <form method="POST" action="{{ url_for('surat.ajukan') }}" enctype="multipart/form-data">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Jenis Surat</label>
+        <select name="jenis_surat" required>
+          <option value="">-- Pilih Jenis Surat --</option>
+          {% for j in jenis_list %}
+            <option value="{{ j }}">{{ j }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Upload KTP (PDF/JPG/PNG)</label>
+        <input type="file" name="file_ktp" accept=".pdf,.jpg,.jpeg,.png">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Keperluan</label>
+      <textarea name="keperluan" rows="3" placeholder="Jelaskan keperluan pengajuan surat..." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Riwayat Pengajuan Surat</h2>
+  {% if surats %}
+  <table>
+    <thead>
+      <tr>
+        <th>Jenis Surat</th>
+        <th>Keperluan</th>
+        {% if current_user.role == 'admin' %}<th>Pemohon</th>{% endif %}
+        <th>Tanggal</th>
+        <th>Dokumen</th>
+        <th>Status</th>
+        {% if current_user.role == 'admin' %}<th>Update Status</th>{% endif %}
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in surats %}
+      <tr>
+        <td><strong>{{ s.jenis_surat }}</strong></td>
+        <td style="max-width:180px;font-size:0.85rem;">{{ s.keperluan }}</td>
+        {% if current_user.role == 'admin' %}<td>{{ s.user.nama }}</td>{% endif %}
+        <td>{{ s.created_at.strftime('%d %b %Y') }}</td>
+        <td>
+          {% if s.file_ktp_url %}
+            <a href="{{ s.file_ktp_url }}" target="_blank" class="btn btn-sm" style="background:var(--blue-pale);color:var(--blue-dark);">📎 Lihat</a>
+          {% else %}-{% endif %}
+        </td>
+        <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span></td>
+        {% if current_user.role == 'admin' %}
+        <td>
+          <form method="POST" action="{{ url_for('surat.update', id=s.id) }}" style="display:flex;gap:0.4rem;flex-direction:column;">
+            <select name="status" style="font-size:0.82rem;padding:0.3rem;border-radius:6px;border:1px solid #ccc;">
+              <option value="menunggu" {% if s.status=='menunggu' %}selected{% endif %}>Menunggu</option>
+              <option value="diproses" {% if s.status=='diproses' %}selected{% endif %}>Diproses</option>
+              <option value="selesai" {% if s.status=='selesai' %}selected{% endif %}>Selesai</option>
+              <option value="ditolak" {% if s.status=='ditolak' %}selected{% endif %}>Ditolak</option>
+            </select>
+            <input type="text" name="catatan_admin" placeholder="Catatan admin..." style="font-size:0.82rem;padding:0.3rem;border-radius:6px;border:1px solid #ccc;" value="{{ s.catatan_admin or '' }}">
+            <button type="submit" class="btn btn-sm btn-success">Simpan</button>
+          </form>
+        </td>
+        {% endif %}
+        <td>
+          <form method="POST" action="{{ url_for('surat.hapus', id=s.id) }}" onsubmit="return confirm('Hapus pengajuan ini?')">
+            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:2rem;">Belum ada pengajuan surat.</p>
+  {% endif %}
+</div>
+{% endblock %}

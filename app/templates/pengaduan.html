@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Pengaduan — SmartKampung{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>📢 Kirim Pengaduan</h2>
+  <form method="POST" action="{{ url_for('pengaduan.kirim') }}" enctype="multipart/form-data">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Judul Pengaduan</label>
+        <input type="text" name="judul" placeholder="Ringkasan masalah" required>
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <select name="kategori" required>
+          <option value="">-- Pilih Kategori --</option>
+          {% for k in kategori_list %}
+            <option value="{{ k }}">{{ k }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Lokasi</label>
+        <input type="text" name="lokasi" placeholder="RT/RW, nama jalan, dll">
+      </div>
+      <div class="form-group">
+        <label>Upload Foto Bukti (JPG/PNG)</label>
+        <input type="file" name="file_foto" accept=".jpg,.jpeg,.png,.pdf">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Deskripsi Masalah</label>
+      <textarea name="deskripsi" rows="4" placeholder="Jelaskan masalah secara detail..." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Kirim Pengaduan</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Daftar Pengaduan</h2>
+  {% if pengaduans %}
+  <table>
+    <thead>
+      <tr>
+        <th>Judul</th>
+        <th>Kategori</th>
+        <th>Lokasi</th>
+        {% if current_user.role == 'admin' %}<th>Pelapor</th>{% endif %}
+        <th>Foto</th>
+        <th>Status</th>
+        {% if current_user.role == 'admin' %}<th>Tanggapi</th>{% endif %}
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pengaduans %}
+      <tr>
+        <td><strong>{{ p.judul }}</strong><br><small style="color:var(--muted);">{{ p.deskripsi[:60] }}...</small></td>
+        <td>{{ p.kategori }}</td>
+        <td>{{ p.lokasi or '-' }}</td>
+        {% if current_user.role == 'admin' %}<td>{{ p.user.nama }}</td>{% endif %}
+        <td>
+          {% if p.file_foto_url %}
+            <a href="{{ p.file_foto_url }}" target="_blank" class="btn btn-sm" style="background:var(--blue-pale);color:var(--blue-dark);">📷 Lihat</a>
+          {% else %}-{% endif %}
+        </td>
+        <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+        {% if current_user.role == 'admin' %}
+        <td>
+          <form method="POST" action="{{ url_for('pengaduan.tanggapi', id=p.id) }}" style="display:flex;gap:0.4rem;flex-direction:column;">
+            <select name="status" style="font-size:0.82rem;padding:0.3rem;border-radius:6px;border:1px solid #ccc;">
+              <option value="diterima" {% if p.status=='diterima' %}selected{% endif %}>Diterima</option>
+              <option value="ditangani" {% if p.status=='ditangani' %}selected{% endif %}>Ditangani</option>
+              <option value="resolved" {% if p.status=='resolved' %}selected{% endif %}>Resolved</option>
+            </select>
+            <input type="text" name="tanggapan" placeholder="Tanggapan admin..." style="font-size:0.82rem;padding:0.3rem;border-radius:6px;border:1px solid #ccc;" value="{{ p.tanggapan or '' }}">
+            <button type="submit" class="btn btn-sm btn-success">Kirim</button>
+          </form>
+        </td>
+        {% endif %}
+        <td>
+          <form method="POST" action="{{ url_for('pengaduan.hapus', id=p.id) }}" onsubmit="return confirm('Hapus pengaduan ini?')">
+            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:2rem;">Belum ada pengaduan.</p>
+  {% endif %}
+</div>
+{% endblock %}

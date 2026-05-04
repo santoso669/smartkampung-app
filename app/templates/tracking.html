@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Tracking Status — SmartKampung{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>🔍 Tracking Status Pengajuan Surat</h2>
+  {% if surats %}
+  <table>
+    <thead>
+      <tr>
+        <th>Jenis Surat</th>
+        {% if current_user.role == 'admin' %}<th>Pemohon</th>{% endif %}
+        <th>Tanggal Ajuan</th>
+        <th>Terakhir Update</th>
+        <th>Status</th>
+        <th>Catatan Admin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in surats %}
+      <tr>
+        <td><strong>{{ s.jenis_surat }}</strong></td>
+        {% if current_user.role == 'admin' %}<td>{{ s.user.nama }}</td>{% endif %}
+        <td>{{ s.created_at.strftime('%d %b %Y %H:%M') }}</td>
+        <td>{{ s.updated_at.strftime('%d %b %Y %H:%M') }}</td>
+        <td><span class="badge badge-{{ s.status }}">{{ s.status }}</span></td>
+        <td>{{ s.catatan_admin or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:2rem;">Belum ada pengajuan surat.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>🔍 Tracking Status Pengaduan</h2>
+  {% if pengaduans %}
+  <table>
+    <thead>
+      <tr>
+        <th>Judul</th>
+        <th>Kategori</th>
+        {% if current_user.role == 'admin' %}<th>Pelapor</th>{% endif %}
+        <th>Tanggal</th>
+        <th>Status</th>
+        <th>Tanggapan</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pengaduans %}
+      <tr>
+        <td><strong>{{ p.judul }}</strong></td>
+        <td>{{ p.kategori }}</td>
+        {% if current_user.role == 'admin' %}<td>{{ p.user.nama }}</td>{% endif %}
+        <td>{{ p.created_at.strftime('%d %b %Y %H:%M') }}</td>
+        <td><span class="badge badge-{{ p.status }}">{{ p.status }}</span></td>
+        <td>{{ p.tanggapan or '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:2rem;">Belum ada pengaduan.</p>
+  {% endif %}
+</div>
+{% endblock %}

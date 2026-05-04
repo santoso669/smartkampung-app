@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+venv/
+env/
+instance/
+*.sqlite3
+task-definition.json

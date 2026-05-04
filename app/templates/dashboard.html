@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — SmartKampung{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>Selamat Datang, {{ current_user.nama }}!</h1>
+  <p>{% if current_user.role == 'admin' %}Panel Admin Kelurahan — kelola pengajuan surat dan pengaduan masyarakat.{% else %}Pantau status layanan administrasi dan pengaduan kamu di sini.{% endif %}</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-label">Total Surat</div>
+    <div class="stat-value">{{ total_surat }}</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-label">Surat Menunggu</div>
+    <div class="stat-value">{{ surat_pending }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-label">Total Pengaduan</div>
+    <div class="stat-value">{{ total_pengaduan }}</div>
+  </div>
+  <div class="stat-card red">
+    <div class="stat-label">Pengaduan Baru</div>
+    <div class="stat-value">{{ pengaduan_pending }}</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Menu Utama</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+    <a href="{{ url_for('surat.index') }}" class="btn btn-primary" style="text-align:center;padding:1.2rem;">📄 Pengajuan Surat</a>
+    <a href="{{ url_for('pengaduan.index') }}" class="btn btn-accent" style="text-align:center;padding:1.2rem;">📢 Pengaduan</a>
+    <a href="{{ url_for('tracking.index') }}" class="btn" style="text-align:center;padding:1.2rem;background:var(--blue-mid);color:#fff;">🔍 Tracking Status</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SmartKampung{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue-dark:  #0a2540;
+      --blue-mid:   #1a56a0;
+      --blue-light: #2d7dd2;
+      --blue-pale:  #e8f1fb;
+      --accent:     #f4a438;
+      --green:      #28a745;
+      --text:       #1a2535;
+      --muted:      #6b7c93;
+      --white:      #ffffff;
+      --danger:     #e05252;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f4f8; color: var(--text); min-height: 100vh; }
+
+    nav {
+      background: var(--blue-dark);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 62px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--white); text-decoration: none; }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 0.3rem; align-items: center; }
+    .nav-links a { color: rgba(255,255,255,0.82); text-decoration: none; font-size: 0.88rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 6px; transition: all 0.2s; }
+    .nav-links a:hover { background: rgba(255,255,255,0.12); color: var(--white); }
+    .btn-logout { background: rgba(244,164,56,0.2); color: var(--accent) !important; border: 1px solid rgba(244,164,56,0.4); }
+    .btn-logout:hover { background: var(--accent) !important; color: var(--white) !important; }
+
+    .flash-container { padding: 1rem 2rem 0; }
+    .flash { padding: 0.75rem 1.2rem; border-radius: 8px; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .flash.success { background: #d4edda; color: #1a5c2e; border-left: 4px solid #28a745; }
+    .flash.danger  { background: #fde8e8; color: #8b1a1a; border-left: 4px solid var(--danger); }
+    .flash.info    { background: #d6eaf8; color: #1a3d5c; border-left: 4px solid var(--blue-light); }
+    .flash.warning { background: #fff3cd; color: #7a5200; border-left: 4px solid var(--accent); }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .card { background: var(--white); border-radius: 14px; padding: 1.8rem; box-shadow: 0 2px 16px rgba(10,37,64,0.08); margin-bottom: 1.5rem; }
+    .card h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--blue-dark); margin-bottom: 1.2rem; border-bottom: 2px solid var(--blue-pale); padding-bottom: 0.7rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #d0dce8; border-radius: 8px; font-family: inherit; font-size: 0.95rem; color: var(--text); background: #fafcff; transition: border 0.2s; outline: none; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue-light); background: var(--white); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .btn { padding: 0.6rem 1.4rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .btn-primary { background: var(--blue-light); color: var(--white); }
+    .btn-primary:hover { background: var(--blue-mid); transform: translateY(-1px); }
+    .btn-danger { background: var(--danger); color: var(--white); font-size: 0.82rem; padding: 0.4rem 0.9rem; }
+    .btn-success { background: var(--green); color: var(--white); font-size: 0.82rem; padding: 0.4rem 0.9rem; }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+    .btn-accent { background: var(--accent); color: var(--white); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: var(--blue-pale); color: var(--blue-dark); font-weight: 700; padding: 0.7rem 1rem; text-align: left; }
+    td { padding: 0.65rem 1rem; border-bottom: 1px solid #eaf0f8; }
+    tr:hover td { background: #f5f8fc; }
+
+    .badge { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+    .badge-menunggu  { background: #fff3cd; color: #7a5200; }
+    .badge-diproses  { background: #d6eaf8; color: #1a3d5c; }
+    .badge-selesai   { background: #d4edda; color: #1a5c2e; }
+    .badge-ditolak   { background: #fde8e8; color: #8b1a1a; }
+    .badge-diterima  { background: #fff3cd; color: #7a5200; }
+    .badge-ditangani { background: #d6eaf8; color: #1a3d5c; }
+    .badge-resolved  { background: #d4edda; color: #1a5c2e; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--white); border-radius: 14px; padding: 1.4rem 1.6rem; box-shadow: 0 2px 12px rgba(10,37,64,0.07); border-left: 5px solid var(--blue-light); }
+    .stat-card.orange { border-left-color: var(--accent); }
+    .stat-card.green  { border-left-color: var(--green); }
+    .stat-card.red    { border-left-color: var(--danger); }
+    .stat-label { font-size: 0.82rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2.2rem; color: var(--blue-dark); line-height: 1.1; margin-top: 0.2rem; }
+
+    .hero { background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%); border-radius: 18px; padding: 3rem 2.5rem; color: var(--white); margin-bottom: 2rem; position: relative; overflow: hidden; }
+    .hero::before { content: '🏘️'; position: absolute; font-size: 8rem; right: 2rem; top: 50%; transform: translateY(-50%); opacity: 0.12; }
+    .hero h1 { font-family: 'DM Serif Display', serif; font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .hero p  { opacity: 0.85; font-size: 1rem; max-width: 500px; }
+
+    footer { text-align: center; padding: 1.5rem; font-size: 0.82rem; color: var(--muted); margin-top: 2rem; }
+
+    @media (max-width: 700px) {
+      .form-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="{{ url_for('auth.index') }}" class="nav-brand">Smart<span>Kampung</span></a>
+  <div class="nav-links">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('auth.dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('surat.index') }}">📄 Surat</a>
+      <a href="{{ url_for('pengaduan.index') }}">📢 Pengaduan</a>
+      <a href="{{ url_for('tracking.index') }}">🔍 Tracking</a>
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+    {% else %}
+      <a href="{{ url_for('auth.login') }}">Login</a>
+      <a href="{{ url_for('auth.register') }}">Daftar</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+      <div class="flash {{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<main>{% block content %}{% endblock %}</main>
+<footer>SmartKampung &copy; 2026 — Sistem Pelayanan Publik Digital Desa/Kelurahan</footer>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}SmartKampung — Pelayanan Publik Digital{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>SmartKampung</h1>
+  <p>Platform digital pelayanan publik desa/kelurahan — pengajuan surat, pengaduan masyarakat, dan tracking status layanan dalam satu aplikasi berbasis cloud.</p>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-bottom:2rem;">
+  <div class="card" style="text-align:center;margin:0;">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem;">📄</div>
+    <h3 style="color:var(--blue-dark);margin-bottom:0.5rem;">Pengajuan Surat</h3>
+    <p style="font-size:0.88rem;color:var(--muted);">Ajukan surat domisili, usaha, dan dokumen administrasi lainnya secara online.</p>
+  </div>
+  <div class="card" style="text-align:center;margin:0;">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem;">📢</div>
+    <h3 style="color:var(--blue-dark);margin-bottom:0.5rem;">Pengaduan Masyarakat</h3>
+    <p style="font-size:0.88rem;color:var(--muted);">Sampaikan keluhan dan laporan masalah lingkungan kepada pihak kelurahan.</p>
+  </div>
+  <div class="card" style="text-align:center;margin:0;">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem;">🔍</div>
+    <h3 style="color:var(--blue-dark);margin-bottom:0.5rem;">Tracking Status</h3>
+    <p style="font-size:0.88rem;color:var(--muted);">Pantau status pengajuan surat dan pengaduan secara real-time.</p>
+  </div>
+</div>
+
+<div style="text-align:center;">
+  <a href="{{ url_for('auth.register') }}" class="btn btn-primary" style="margin-right:1rem;padding:0.8rem 2rem;">Daftar Sekarang</a>
+  <a href="{{ url_for('auth.login') }}" class="btn" style="padding:0.8rem 2rem;background:var(--white);color:var(--blue-dark);border:2px solid var(--blue-light);">Login</a>
+</div>
+{% endblock %}
