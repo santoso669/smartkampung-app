@@ -9,7 +9,7 @@ env:
   AWS_REGION:       ap-southeast-1
   ECR_REPOSITORY:   smartkampung-app
   ECS_CLUSTER:      smartkampung-cluster
-  ECS_SERVICE:      smartkampung-service
+  ECS_SERVICE:      smartkampung-task-service-a8i6ge6n
   CONTAINER_NAME:   smartkampung-app
 
 jobs:
@@ -41,24 +41,24 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Download task definition
+      - name: Download and clean task definition
         run: |
           aws ecs describe-task-definition \
             --task-definition smartkampung-task \
-            --query taskDefinition > task-definition.json
+            --query taskDefinition > task-definition-raw.json
+          
+          cat task-definition-raw.json | python3 -c "
+          import json, sys
+          td = json.load(sys.stdin)
+          keys_to_remove = ['taskDefinitionArn','revision','status','requiresAttributes',
+                            'compatibilities','registeredAt','registeredBy','enableFaultInjection']
+          for k in keys_to_remove:
+              td.pop(k, None)
+          print(json.dumps(td))
+          " > task-definition.json
 
       - name: Update ECS task definition with new image
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name:  ${{ env.CONTAINER_NAME }}
-          image:           ${{ steps.build-image.outputs.image }}
-
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service:         ${{ env.ECS_SERVICE }}
-          cluster:         ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
